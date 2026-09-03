@@ -1,6 +1,7 @@
 /** Server-side defaults. Production can override the base URL with ADWICE_API_BASE_URL. */
 export const adwiceConfig = {
   apiBaseUrl: "http://api.adbud.test",
+  apiToken: "", // Set the registration API bearer token here.
   accountRequestPath: "/adbud/request",
   email: {
     host: "smtp.gmail.com",

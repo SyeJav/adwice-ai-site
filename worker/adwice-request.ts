@@ -17,12 +17,13 @@ function validate(body: Record<string, unknown>): FieldErrors {
     catch { errors.url = ["Enter a valid website URL, including https://."]; }
   }
   if (body.budget != null && (typeof body.budget !== "number" || !Number.isFinite(body.budget) || body.budget < 0)) errors.budget = ["Budget must be a positive number."];
-  for (const field of ["phone", "language", "plan", "promotion"] as const) {
+  for (const field of ["phone", "language", "country", "plan", "promotion", "requestType"] as const) {
     if (body[field] != null && typeof body[field] !== "string") errors[field] = ["This field must be text."];
   }
   if (typeof body.plan !== "string" || !adwicePlans.some(({ id }) => id === body.plan)) {
     errors.plan = ["Select a valid advertising plan."];
   }
+  if (body.requestType != null && body.requestType !== "agency" && body.requestType !== "business") errors.requestType = ["Invalid request type."];
   return errors;
 }
 
@@ -40,15 +41,20 @@ export async function handleAdwiceRequest(request: Request, env: AdwiceEnv): Pro
     language: typeof input.language === "string" && input.language.trim() ? input.language.trim() : null,
     plan: (input.plan as string).trim(),
     promotion: typeof input.promotion === "string" && input.promotion.trim() ? input.promotion.trim() : null,
+    ...(typeof input.country === "string" && input.country.trim() ? { country: input.country.trim().toLowerCase() } : {}),
+    ...(input.requestType === "agency" || input.requestType === "business" ? { requestType: input.requestType } : {}),
   };
   try {
     const baseUrl = (env.ADWICE_API_BASE_URL || adwiceConfig.apiBaseUrl).replace(/\/$/, "");
-    const upstream = await fetch(`${baseUrl}${adwiceConfig.accountRequestPath}`, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload) });
+    const headers: Record<string, string> = { "Content-Type": "application/json", Accept: "application/json" };
+    if (adwiceConfig.apiToken) headers.Authorization = `Bearer ${adwiceConfig.apiToken}`;
+    const upstream = await fetch(`${baseUrl}${adwiceConfig.accountRequestPath}`, { method: "POST", headers, body: JSON.stringify(payload) });
     const data = await upstream.json().catch(() => null);
     if (upstream.status === 422 && data && typeof data === "object") return json(data, 422);
     if (!upstream.ok || !data || typeof data !== "object") return json({ status: "error", message: "We couldn't submit your request right now." }, 502);
-    if (upstream.ok && (data as { status?: unknown }).status === "success" && env.ADWICE_SMTP_PASSWORD) {
-      await sendAgencyLeadEmail(payload, env.ADWICE_SMTP_PASSWORD);
+    if (payload.requestType === "agency" && upstream.ok && (data as { status?: unknown }).status === "success" && env.ADWICE_SMTP_PASSWORD) {
+      try { await sendAgencyLeadEmail(payload, env.ADWICE_SMTP_PASSWORD); }
+      catch (error) { console.error("Agency lead email could not be sent.", error); }
     }
     return json(data, upstream.status);
   } catch { return json({ status: "error", message: "We couldn't reach Adwice right now. Please try again shortly." }, 502); }
