@@ -12,7 +12,10 @@ export interface AgencyLead {
   promotion: string | null;
 }
 
-export async function sendAgencyLeadEmail(lead: AgencyLead, password: string): Promise<void> {
+export async function sendAgencyLeadEmail(
+  lead: AgencyLead,
+  password: string,
+): Promise<void> {
   const smtp = adwiceConfig.email;
   const transporter = nodemailer.createTransport({
     host: smtp.host,
@@ -22,7 +25,8 @@ export async function sendAgencyLeadEmail(lead: AgencyLead, password: string): P
     auth: { user: smtp.username, pass: password },
   });
 
-  const detail = (label: string, value: string | number | null) => `${label}: ${value ?? "—"}`;
+  const detail = (label: string, value: string | number | null) =>
+    `${label}: ${value ?? "—"}`;
   await transporter.sendMail({
     from: { name: smtp.name, address: smtp.address },
     to: smtp.recipient,
