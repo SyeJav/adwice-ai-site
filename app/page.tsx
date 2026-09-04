@@ -2,6 +2,8 @@
 import { FormEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import { adwicePlans } from "../config/adwice-plans";
+import { getNames } from "country-list";
+import Select from "react-select";
 type Audience = "business" | "agency";
 type Platform = "search" | "meta" | "both";
 type Currency = "USD" | "INR";
@@ -160,6 +162,8 @@ const budgetLevel = (n: number, currency: Currency) => {
         ? ["Growth", "Broader reach with faster learning."]
         : ["Scale", "Built for multiple offers, audiences, or locations."];
 };
+
+const countryOptions = getNames().sort().map(name => ({ value: name, label: name }));
 export default function Home() {
   const [audience, setAudience] = useState<Audience>("business");
   const [platform, setPlatform] = useState<Platform | null>(null);
@@ -279,6 +283,86 @@ export default function Home() {
       setAgencySending(false);
     }
   };
+  
+  const submitBusiness = async () => {
+    if (!platform || agencySending) return;
+    
+    const form = document.getElementById("business-contact-form") as HTMLFormElement;
+    if (form && !form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const d = new FormData(form);
+    setAgencySending(true);
+    setAgencySent(false);
+    setFormError("");
+    setFieldErrors({});
+
+    sendEvent("campaign_builder_started", audience, {
+      platform,
+      budget,
+      fee,
+      currency,
+    });
+
+    try {
+      // 1. Grab a valid plan ID from your existing config to satisfy the API
+      const fallbackPlanId = adwicePlans.length > 0 ? adwicePlans[0].id : "default-plan";
+
+      const response = await fetch("/api/adwice/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: d.get("name"),
+          email: d.get("email"),
+          url: d.get("url"),
+          phone: d.get("phone") || null,
+          
+          // 👉 FIX 1: Force this to null. If it works, we know their DB rejects numbers here.
+          budget: null, 
+          
+          language: navigator.language.split("-")[0] || null,
+          plan: fallbackPlanId, 
+          
+          // 👉 FIX 2: Remove our hack string in case it exceeded a character limit.
+          promotion: null, 
+          
+          country: d.get("country") || "in",
+          address: d.get("address") || null,
+        }),
+      });
+
+      const result = await response.json().catch(() => null);
+
+      if (response.status === 422) {
+        // DIAGNOSTIC LOG: See exactly what the API rejected
+        console.log("Upstream API 422 Error Data:", result?.data); 
+        
+        setFieldErrors(result?.data || {});
+        setFormError(result?.message || "Please check the highlighted fields.");
+        return;
+      }
+
+      if (!response.ok || result?.status !== "success") throw new Error();
+      
+      setAgencySent(true);
+      if(form) form.reset();
+      sendEvent("business_campaign_requested", "business");
+      
+    } catch {
+      setFormError(
+        "We couldn't submit your request right now. Please try again shortly.",
+      );
+    } finally {
+      setAgencySending(false);
+    }
+  };
+
+  
   return (
     <main>
       <header className="nav shell">
@@ -718,70 +802,104 @@ export default function Home() {
                 </dl>
               </div>
             </div>
-            <div style={{ marginTop: "40px",padding: "40px", borderTop: "1px solid #ddd" }}>  
-                <h2 style={{ marginBottom: "20px" , fontSize: "1.5rem", fontWeight: "600" }}>Contact Details</h2>
-            <div className="card" style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "8px", maxWidth:"400px"}}>
-                    <div className="card-body">
-                        <form>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px" }}>
-                            <div style={{ marginBottom: "15px" }}>
-                                <label htmlFor="name">Name</label>
-                                <input
-                                    type="text"
-                                    id="Name"
-                                    name="Name"
-                                    placeholder="Enter your Name"
-                                    style={{ width: "100%",padding: "8px" }}
-                                />
-                            </div>
-                            <div style={{ marginBottom: "15px" }}>
-                                <label htmlFor="email">Email</label>
-                                <input
-                                    type="text"
-                                    id="Email"
-                                    name="Email"
-                                    placeholder="Enter your Email"
-                                    style={{ width: "100%",padding: "8px" }}
-                                />
-                            </div>
-                            <div style={{ marginBottom: "15px" }}>
-                                <label htmlFor="Phone">Phone</label>
-                                <input
-                                    type="text"
-                                    id="Phone"
-                                    name="Phone"
-                                    placeholder="Enter your Phone"
-                                    style={{ width: "100%",padding: "8px" }}
-                                />
-                            </div>
-                            <div style={{ marginBottom: "15px" }}>
-                                <label htmlFor="country">Country</label>
-                                <input
-                                    type="text"
-                                    id="country"
-                                    name="country"
-                                    placeholder="Enter your country"
-                                    style={{ width: "100%",padding: "8px" }}
-                                />
-                            </div>
-                            <div style={{ marginBottom: "15px" }}>
-                                <label htmlFor="address">Address</label>
-                                <input
-                                    type="text"
-                                    id="address"
-                                    name="address"
-                                    placeholder="Enter your address"
-                                    style={{ width: "100%",padding: "8px" }}
-                                />
-                            </div>
-                            </div>
-                            <button type="submit" className="button primary" style={{ padding: "10px" }}>
-                                Submit
-                            </button>
-                        </form>
+          <div className="contact-container">  
+            <h2 className="contact-header">
+                Contact Details
+            </h2>
+            <div className="card contact-card">
+                <form id="business-contact-form">
+                    <div className="form-grid">
+                        
+                        {/* Name (Fixed casing) */}
+                        <div className="form-group">
+                            <label htmlFor="name" className="form-label">Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="Enter your Name"
+                                className="form-input"
+                                required
+                            />
+                        </div>
+
+                        {/* Email (Fixed casing) */}
+                        <div className="form-group">
+                            <label htmlFor="email" className="form-label">Email</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="Enter your Email"
+                                className="form-input"
+                                required
+                            />
+                        </div>
+                        
+                        {/* Website URL (Newly Added) */}
+                        <div className="form-group">
+                            <label htmlFor="url" className="form-label">Website URL</label>
+                            <input
+                                type="url"
+                                id="url"
+                                name="url"
+                                placeholder="https://yourwebsite.com"
+                                className="form-input"
+                                required
+                            />
+                        </div>
+
+                        {/* Phone (Fixed casing) */}
+                        <div className="form-group">
+                            <label htmlFor="phone" className="form-label">Phone</label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                placeholder="Enter your Phone"
+                                className="form-input"
+                            />
+                        </div>
+
+                        {/* Country */}
+                        <div className="form-group">
+                            <label htmlFor="country" className="form-label">Country</label>
+                            <Select
+                                id="country"
+                                name="country"
+                                options={countryOptions}
+                                placeholder="Select your country"
+                                styles={{
+                                    control: (baseStyles) => ({
+                                        ...baseStyles,
+                                        padding: "4px 8px",
+                                        borderRadius: "8px",
+                                        border: "1px solid #ddd",
+                                        backgroundColor: "#fff",
+                                        cursor: "pointer",
+                                        boxShadow: "none",
+                                        fontFamily: "inherit",
+                                        fontSize: "15px"
+                                    })
+                                }}   
+                            />     
+                        </div>
+
+                        {/* Address (Spans full width) */}
+                        <div className="form-group full-width">
+                            <label htmlFor="address" className="form-label">Address</label>
+                            <input
+                                type="text"
+                                id="address"
+                                name="address"
+                                placeholder="Enter your address"
+                                className="form-input"
+                            />
                         </div>
                     </div>
-                </div>
+                </form>
+            </div>
+        </div>
             <p className="feeNote">
               {currency === "INR"
                 ? "Minimum ad spend is ₹100 per day (₹3,000 per month). "
@@ -792,12 +910,25 @@ export default function Home() {
             <div className="actions plannerActions">
               <button
                 className="button primary"
-                disabled={!platform}
-                onClick={build}
+                type="button"
+                disabled={!platform || agencySending}
+                onClick={submitBusiness}
               >
-                Build my campaign <b>↗</b>
+                {agencySending ? "Submitting..." : "Build my campaign"} <b>{agencySending ? "" : "↗"}</b>
               </button>
             </div>
+            
+            {/* Display success/error messages for the business form */}
+            {agencySent && (
+              <p className="formStatus" role="status">
+                Thanks — your campaign plan has been requested.
+              </p>
+            )}
+            {formError && (
+              <p className="formStatus error" role="alert">
+                {formError}
+              </p>
+            )}
             {!platform && (
               <p className="selectionHint">
                 Select Search Ads, Meta Ads, or Both to continue.

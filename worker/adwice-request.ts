@@ -5,22 +5,27 @@ import { sendAgencyLeadEmail } from "./adwice-email";
 export interface AdwiceEnv {
   ADWICE_API_BASE_URL?: string;
   ADWICE_SMTP_PASSWORD?: string;
+  ADWICE_API_TOKEN?: string;
 }
+
 type FieldErrors = Record<string, string[]>;
 const json = (body: unknown, status: number) => Response.json(body, { status });
 
 function validate(body: Record<string, unknown>): FieldErrors {
   const errors: FieldErrors = {};
+  
   for (const field of ["name", "email", "url"] as const) {
-    if (typeof body[field] !== "string" || !body[field].trim())
+    if (typeof body[field] !== "string" || !(body[field] as string).trim())
       errors[field] = ["This field is required."];
   }
+
   if (
     typeof body.email === "string" &&
     body.email.trim() &&
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email.trim())
   )
     errors.email = ["Enter a valid email address."];
+
   if (typeof body.url === "string" && body.url.trim()) {
     try {
       const url = new URL(body.url.trim());
@@ -29,6 +34,7 @@ function validate(body: Record<string, unknown>): FieldErrors {
       errors.url = ["Enter a valid website URL, including https://."];
     }
   }
+
   if (
     body.budget != null &&
     (typeof body.budget !== "number" ||
@@ -36,16 +42,20 @@ function validate(body: Record<string, unknown>): FieldErrors {
       body.budget < 0)
   )
     errors.budget = ["Budget must be a positive number."];
-  for (const field of ["phone", "language", "plan", "promotion"] as const) {
+
+  for (const field of ["phone", "language", "plan", "promotion", "country", "address"] as const) {
     if (body[field] != null && typeof body[field] !== "string")
       errors[field] = ["This field must be text."];
   }
-  if (
-    typeof body.plan !== "string" ||
-    !adwicePlans.some(({ id }) => id === body.plan)
-  ) {
+
+  // Accept both the Agency plans (from config) and Business platforms ("search", "meta", "both")
+  const isValidAgencyPlan = adwicePlans.some(({ id }) => id === body.plan);
+  const isValidBusinessPlan = ["search", "meta", "both"].includes(body.plan as string);
+
+  if (typeof body.plan !== "string" || (!isValidAgencyPlan && !isValidBusinessPlan)) {
     errors.plan = ["Select a valid advertising plan."];
   }
+
   return errors;
 }
 
@@ -55,6 +65,7 @@ export async function handleAdwiceRequest(
 ): Promise<Response> {
   if (request.method !== "POST")
     return new Response(null, { status: 405, headers: { Allow: "POST" } });
+
   let input: Record<string, unknown>;
   try {
     input = (await request.json()) as Record<string, unknown>;
@@ -64,6 +75,7 @@ export async function handleAdwiceRequest(
       400,
     );
   }
+
   const errors = validate(input);
   if (Object.keys(errors).length)
     return json(
@@ -75,43 +87,66 @@ export async function handleAdwiceRequest(
       },
       422,
     );
+
+  // Safely construct the payload without aggressive typecasting
   const payload = {
     name: (input.name as string).trim(),
     email: (input.email as string).trim(),
     url: (input.url as string).trim(),
-    phone:
-      typeof input.phone === "string" && input.phone.trim()
-        ? input.phone.trim()
-        : null,
+    phone: typeof input.phone === "string" && input.phone.trim() ? input.phone.trim() : null,
     budget: typeof input.budget === "number" ? input.budget : null,
-    language:
-      typeof input.language === "string" && input.language.trim()
-        ? input.language.trim()
-        : null,
+    language: typeof input.language === "string" && input.language.trim() ? input.language.trim() : null,
     plan: (input.plan as string).trim(),
-    promotion:
-      typeof input.promotion === "string" && input.promotion.trim()
-        ? input.promotion.trim()
-        : null,
+    promotion: typeof input.promotion === "string" && input.promotion.trim() ? input.promotion.trim() : null,
+    address: {
+      address: typeof input.address === "string" && input.address.trim() ? input.address.trim() : null,
+      country: typeof input.country === "string" && input.country.trim() ? input.country.trim() : "in",
+      city: typeof input.city === "string" && input.city.trim() ? input.city.trim() : null,
+      state: typeof input.state === "string" && input.state.trim() ? input.state.trim() : null,
+      postcode: typeof input.zip === "string" && input.zip.trim() ? input.zip.trim() : null,
+    },
   };
+
   try {
     const baseUrl = (
       env.ADWICE_API_BASE_URL || adwiceConfig.apiBaseUrl
     ).replace(/\/$/, "");
+    
+    const requestUrl = `${baseUrl}${adwiceConfig.accountRequestPath}`;
+    const tokenToUse = env.ADWICE_API_TOKEN || adwiceConfig.ADWICE_API_TOKEN;
+
+    // 1. LOG EXACTLY WHAT WE ARE SENDING
+    console.log("\n========== OUTGOING REQUEST TO ADWICE API ==========");
+    console.log("Target URL:", requestUrl);
+    console.log("Using Token:", tokenToUse ? "Yes (Hidden for security)" : "MISSING TOKEN!");
+    console.log("Payload:", JSON.stringify(payload, null, 2));
+    console.log("====================================================\n");
+
     const upstream = await fetch(
-      `${baseUrl}${adwiceConfig.accountRequestPath}`,
+      requestUrl,
       {
         method: "POST",
         headers: {
+          "Authorization": `Bearer ${tokenToUse}`,
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify(payload),
       },
     );
+
+    // 2. LOG EXACTLY WHAT THE API REPLIES WITH
+    const rawText = await upstream.clone().text();
+    console.log("\n========== RESPONSE FROM ADWICE API ==========");
+    console.log("Status Code:", upstream.status);
+    console.log("Raw Response:", rawText);
+    console.log("==============================================\n");
+
     const data = await upstream.json().catch(() => null);
+
     if (upstream.status === 422 && data && typeof data === "object")
       return json(data, 422);
+
     if (!upstream.ok || !data || typeof data !== "object")
       return json(
         {
@@ -120,6 +155,7 @@ export async function handleAdwiceRequest(
         },
         502,
       );
+
     if (
       upstream.ok &&
       (data as { status?: unknown }).status === "success" &&
@@ -127,13 +163,16 @@ export async function handleAdwiceRequest(
     ) {
       await sendAgencyLeadEmail(payload, env.ADWICE_SMTP_PASSWORD);
     }
+
     return json(data, upstream.status);
-  } catch {
+  } catch (error) {
+    console.log("\n========== FATAL WORKER ERROR ==========");
+    console.error("Worker failed to execute fetch:", error);
+    console.log("========================================\n");
     return json(
       {
         status: "error",
-        message:
-          "We couldn't reach Adwice right now. Please try again shortly.",
+        message: "We couldn't reach Adwice right now. Please try again shortly.",
       },
       502,
     );
