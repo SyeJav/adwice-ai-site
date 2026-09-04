@@ -35,7 +35,7 @@ export default function Home() {
   const price = pricing[currency],
     plan = platform ? adwicePlans[platformPlans[platform]] : null,
     fee = plan?.monthlyPlatformFees[currency] ?? 0,
-    dailyBudgetMicros = Math.round((budget / 30) * 1000000),
+    dailyBudgetMicros = Math.round(budget / 30),
     money = (value: number) =>
       new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", {
         style: "currency",
@@ -62,34 +62,51 @@ export default function Home() {
     setSent(false);
     setError("");
     try {
-      const response = await fetch("/api/adwice/request", {
+      const agencyDemo = audience === "agency";
+      const response = await fetch(
+        agencyDemo ? "/api/agency-demo" : "/api/adwice/request",
+        {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          body: JSON.stringify({
-            name: data.get("name"),
-            email: data.get("email"),
-            url: data.get("url"),
-            phone: data.get("phone") || null,
-            country: data.get("country") || null,
-            budget: audience === "business" ? dailyBudgetMicros : null,
-            language: navigator.language.split("-")[0] || null,
-            plan: data.get("plan"),
-            promotion: null,
-            requestType: audience,
-          }),
-        }),
+          body: JSON.stringify(
+            agencyDemo
+              ? {
+                  name: data.get("name"),
+                  email: data.get("email"),
+                  url: data.get("url"),
+                  phone: data.get("phone") || null,
+                  message: data.get("message") || null,
+                }
+              : {
+                  name: data.get("name"),
+                  email: data.get("email"),
+                  url: data.get("url"),
+                  country: data.get("country") || null,
+                  budget: dailyBudgetMicros,
+                  language: navigator.language.split("-")[0] || null,
+                  plan: data.get("plan"),
+                  promotion: null,
+                  requestType: "business",
+                },
+          ),
+        },
+      ),
         result = (await response.json().catch(() => null)) as {
           status?: string;
+          message?: string;
         } | null;
-      if (!response.ok || result?.status !== "success") throw new Error();
+      if (!response.ok || result?.status !== "success")
+        throw new Error(result?.message);
       setSent(true);
       form.reset();
-    } catch {
+    } catch (error) {
       setError(
-        "We couldn't submit your request right now. Please try again shortly.",
+        error instanceof Error && error.message
+          ? error.message
+          : "We couldn't submit your request right now. Please try again shortly.",
       );
     } finally {
       setSending(false);
@@ -414,17 +431,12 @@ function LeadForm({
         <input type="hidden" name="plan" value={plan} />
       ) : (
         <label>
-          Advertising plan
-          <select name="plan" required defaultValue="">
-            <option value="" disabled>
-              Select a plan
-            </option>
-            {adwicePlans.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.label}
-              </option>
-            ))}
-          </select>
+          Tell us about your agency
+          <textarea
+            name="message"
+            rows={4}
+            placeholder="Tell us about your agency, clients, or what you’d like to discuss"
+          />
         </label>
       )}
       <button

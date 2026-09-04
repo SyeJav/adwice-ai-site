@@ -8,7 +8,9 @@ export const adwiceConfig = {
     port: 587,
     username: "myadwice@gmail.com",
     passwordEnv: "ADWICE_SMTP_PASSWORD",
-    address: "care@myadwice.com",
+    // Gmail only permits a different From address when it is a verified alias.
+    // Use the authenticated mailbox so delivery does not depend on that setup.
+    address: "myadwice@gmail.com",
     name: "AdWice",
     recipient: "care@myadwice.com",
   },

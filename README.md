@@ -17,9 +17,11 @@ which validates and forwards them to Adwice. Locally it defaults to
 `ADWICE_API_BASE_URL` with the production API origin (without `/adbud/request`).
 This value is server-only; no API hostname or credentials enter the browser bundle.
 
-Successful agency requests also send an SMTP notification using the non-secret
-settings in `config/adwice.ts`. Configure `ADWICE_SMTP_PASSWORD` as a secret
-Worker binding in production. Never add the Gmail app password to source control.
+Agency-demo requests are sent to `/api/agency-demo` and only send an SMTP
+notification to `care@myadwice.com`; they never call the Adwice registration
+API. Configure `ADWICE_SMTP_PASSWORD` as a secret Worker binding in production
+with a Gmail App Password for `myadwice@gmail.com`. Never add that password to
+source control.
 
 ## Sites Lifecycle
 

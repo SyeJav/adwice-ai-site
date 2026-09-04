@@ -9,6 +9,33 @@ export interface AdwiceEnv {
 type FieldErrors = Record<string, string[]>;
 const json = (body: unknown, status: number) => Response.json(body, { status });
 
+function validateAgencyDemo(body: Record<string, unknown>): FieldErrors {
+  const errors: FieldErrors = {};
+  for (const field of ["name", "email", "url"] as const) {
+    if (typeof body[field] !== "string" || !body[field].trim())
+      errors[field] = ["This field is required."];
+  }
+  if (
+    typeof body.email === "string" &&
+    body.email.trim() &&
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email.trim())
+  )
+    errors.email = ["Enter a valid email address."];
+  if (typeof body.url === "string" && body.url.trim()) {
+    try {
+      const url = new URL(body.url.trim());
+      if (!['http:', 'https:'].includes(url.protocol)) throw new Error();
+    } catch {
+      errors.url = ["Enter a valid website URL, including https://."];
+    }
+  }
+  for (const field of ["phone", "message"] as const) {
+    if (body[field] != null && typeof body[field] !== "string")
+      errors[field] = ["This field must be text."];
+  }
+  return errors;
+}
+
 function validate(body: Record<string, unknown>): FieldErrors {
   const errors: FieldErrors = {};
   for (const field of ["name", "email", "url"] as const) {
@@ -62,6 +89,65 @@ function validate(body: Record<string, unknown>): FieldErrors {
   return errors;
 }
 
+export async function handleAgencyDemoRequest(
+  request: Request,
+  env: AdwiceEnv,
+): Promise<Response> {
+  if (request.method !== "POST")
+    return new Response(null, { status: 405, headers: { Allow: "POST" } });
+  let input: Record<string, unknown>;
+  try {
+    input = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return json(
+      { status: "fail", message: "Invalid JSON request.", code: 400, data: {} },
+      400,
+    );
+  }
+  const errors = validateAgencyDemo(input);
+  if (Object.keys(errors).length)
+    return json(
+      {
+        status: "fail",
+        message: "Please check the highlighted fields.",
+        code: 422,
+        data: errors,
+      },
+      422,
+    );
+  if (!env.ADWICE_SMTP_PASSWORD)
+    return json(
+      { status: "error", message: "Email service is not configured right now." },
+      503,
+    );
+  const lead = {
+    name: (input.name as string).trim(),
+    email: (input.email as string).trim(),
+    url: (input.url as string).trim(),
+    phone:
+      typeof input.phone === "string" && input.phone.trim()
+        ? input.phone.trim()
+        : null,
+    message:
+      typeof input.message === "string" && input.message.trim()
+        ? input.message.trim()
+        : null,
+  };
+  try {
+    await sendAgencyLeadEmail(lead, env.ADWICE_SMTP_PASSWORD);
+    return json(
+      { status: "success", message: "Your agency request was received." },
+      200,
+    );
+  } catch (error) {
+    console.error("Agency lead email could not be sent.", error);
+    return json(
+      { status: "error", message: "We couldn't send your request right now." },
+      502,
+    );
+  }
+}
+
 export async function handleAdwiceRequest(
   request: Request,
   env: AdwiceEnv,
@@ -101,7 +187,10 @@ export async function handleAdwiceRequest(
       typeof input.language === "string" && input.language.trim()
         ? input.language.trim()
         : null,
-    plan: (input.plan as string).trim(),
+    plan:
+      typeof input.plan === "string" && input.plan.trim()
+        ? input.plan.trim()
+        : null,
     promotion:
       typeof input.promotion === "string" && input.promotion.trim()
         ? input.promotion.trim()
@@ -113,6 +202,7 @@ export async function handleAdwiceRequest(
       ? { requestType: input.requestType }
       : {}),
   };
+
   try {
     const baseUrl = (
       env.ADWICE_API_BASE_URL || adwiceConfig.apiBaseUrl
@@ -138,18 +228,6 @@ export async function handleAdwiceRequest(
         },
         502,
       );
-    if (
-      payload.requestType === "agency" &&
-      upstream.ok &&
-      (data as { status?: unknown }).status === "success" &&
-      env.ADWICE_SMTP_PASSWORD
-    ) {
-      try {
-        await sendAgencyLeadEmail(payload, env.ADWICE_SMTP_PASSWORD);
-      } catch (error) {
-        console.error("Agency lead email could not be sent.", error);
-      }
-    }
     return json(data, upstream.status);
   } catch {
     return json(

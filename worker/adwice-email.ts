@@ -6,10 +6,7 @@ export interface AgencyLead {
   email: string;
   url: string;
   phone: string | null;
-  budget: number | null;
-  language: string | null;
-  plan: string | null;
-  promotion: string | null;
+  message: string | null;
 }
 
 export async function sendAgencyLeadEmail(
@@ -40,10 +37,7 @@ export async function sendAgencyLeadEmail(
       detail("Email", lead.email),
       detail("Website", lead.url),
       detail("Phone", lead.phone),
-      detail("Budget", lead.budget),
-      detail("Language", lead.language),
-      detail("Plan", lead.plan),
-      detail("Promotion", lead.promotion),
+      detail("Message", lead.message),
     ].join("\n"),
   });
 }
