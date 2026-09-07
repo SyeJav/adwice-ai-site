@@ -3,19 +3,22 @@ export const adwicePlans = [
     id: "plan_01",
     label: "Search Ads",
     description: "Capture people actively searching",
-    monthlyPlatformFees: { USD: 29, INR: 2499 },
+    monthlyPlatformFees: { USD: 39, INR: 2999 },
+    default_budget: { USD: 5, INR: 150 },
   },
   {
     id: "plan_02",
     label: "Social Ads",
     description: "Create demand on Facebook & Instagram",
-    monthlyPlatformFees: { USD: 49, INR: 3999 },
+    monthlyPlatformFees: { USD: 39, INR: 3999 },
+    default_budget: { USD: 5, INR: 150 },
   },
   {
     id: "plan_03",
     label: "Search + Social Ads",
     description: "Capture demand and create more of it",
-    monthlyPlatformFees: { USD: 79, INR: 5999 },
+    monthlyPlatformFees: { USD: 69, INR: 5999 },
+    default_budget: { USD: 10, INR: 300 },
   },
 ] as const;
 

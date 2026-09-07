@@ -2,13 +2,14 @@
 import { FormEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import { adwicePlans } from "../config/adwice-plans";
+import { SiteFooter } from "./components/site-footer";
 
 type Audience = "business" | "agency";
 type Platform = "search" | "meta" | "both";
 type Currency = "USD" | "INR";
 const platformPlans: Record<Platform, number> = { search: 0, meta: 1, both: 2 };
 const pricing = {
-  USD: { min: 300, max: 10000, step: 100, start: 1000 },
+  USD: { min: 150, max: 10000, step: 100, start: 1000 },
   INR: { min: 3000, max: 300000, step: 500, start: 10000 },
 };
 const countries = [
@@ -48,11 +49,13 @@ export default function Home() {
       .then((d) => {
         if (d.country === "IN") {
           setCurrency("INR");
-          setBudget(pricing.INR.start);
         }
       })
       .catch(() => undefined);
   }, []);
+  useEffect(() => {
+    if (plan) setBudget(plan.default_budget[currency] * 30);
+  }, [currency, plan]);
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (sending) return;
@@ -347,21 +350,7 @@ export default function Home() {
           />
         </section>
       )}
-      <footer className="shell">
-        <a className="brand" href="#top">
-          <Image
-            src="/brand/adwice-with-text.svg"
-            alt="Adwice"
-            width={247}
-            height={86}
-          />
-        </a>
-        <p>AI-powered campaign strategy, optimization, and reporting.</p>
-        <div>
-          <a href="mailto:care@myadwice.com">care@myadwice.com</a>
-          <span>© 2026 Adwice</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
