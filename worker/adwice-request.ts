@@ -4,10 +4,49 @@ import { sendAgencyLeadEmail } from "./adwice-email";
 
 export interface AdwiceEnv {
   ADWICE_API_BASE_URL?: string;
+  ADWICE_API_TOKEN?: string;
+  ADWICE_INR_API_URL?: string;
+  ADWICE_INR_API_TOKEN?: string;
+  ADWICE_USD_API_URL?: string;
+  ADWICE_USD_API_TOKEN?: string;
+  ADWICE_EUR_API_URL?: string;
+  ADWICE_EUR_API_TOKEN?: string;
   ADWICE_SMTP_PASSWORD?: string;
 }
 type FieldErrors = Record<string, string[]>;
+type Currency = "INR" | "USD" | "EUR";
+const currencies: readonly Currency[] = ["INR", "USD", "EUR"];
 const json = (body: unknown, status: number) => Response.json(body, { status });
+
+function currencyFrom(input: Record<string, unknown>): Currency {
+  return typeof input.currency === "string" &&
+    currencies.includes(input.currency as Currency)
+    ? (input.currency as Currency)
+    : "USD";
+}
+
+function apiConfigFor(currency: Currency, env: AdwiceEnv) {
+  const marketConfig = {
+    INR: {
+      url: env.ADWICE_INR_API_URL,
+      token: env.ADWICE_INR_API_TOKEN,
+    },
+    USD: {
+      url: env.ADWICE_USD_API_URL,
+      token: env.ADWICE_USD_API_TOKEN,
+    },
+    EUR: {
+      url: env.ADWICE_EUR_API_URL,
+      token: env.ADWICE_EUR_API_TOKEN,
+    },
+  }[currency];
+  return {
+    url:
+      marketConfig.url ||
+      `${(env.ADWICE_API_BASE_URL || adwiceConfig.apiBaseUrl).replace(/\/$/, "")}${adwiceConfig.accountRequestPath}`,
+    token: marketConfig.token || env.ADWICE_API_TOKEN,
+  };
+}
 
 function validateAgencyDemo(body: Record<string, unknown>): FieldErrors {
   const errors: FieldErrors = {};
@@ -70,6 +109,7 @@ function validate(body: Record<string, unknown>): FieldErrors {
     "plan",
     "promotion",
     "requestType",
+    "currency",
   ] as const) {
     if (body[field] != null && typeof body[field] !== "string")
       errors[field] = ["This field must be text."];
@@ -86,6 +126,12 @@ function validate(body: Record<string, unknown>): FieldErrors {
     body.requestType !== "business"
   )
     errors.requestType = ["Invalid request type."];
+  if (
+    body.currency != null &&
+    (typeof body.currency !== "string" ||
+      !currencies.includes(body.currency as Currency))
+  )
+    errors.currency = ["Select a valid currency."];
   return errors;
 }
 
@@ -204,19 +250,17 @@ export async function handleAdwiceRequest(
   };
 
   try {
-    const baseUrl = (
-      env.ADWICE_API_BASE_URL || adwiceConfig.apiBaseUrl
-    ).replace(/\/$/, "");
+    const apiConfig = apiConfigFor(currencyFrom(input), env);
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       Accept: "application/json",
     };
-    if (adwiceConfig.apiToken)
-      headers.Authorization = `Bearer ${adwiceConfig.apiToken}`;
-    const upstream = await fetch(
-      `${baseUrl}${adwiceConfig.accountRequestPath}`,
-      { method: "POST", headers, body: JSON.stringify(payload) },
-    );
+    if (apiConfig.token) headers.Authorization = `Bearer ${apiConfig.token}`;
+    const upstream = await fetch(apiConfig.url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
     const data = await upstream.json().catch(() => null);
     if (upstream.status === 422 && data && typeof data === "object")
       return json(data, 422);

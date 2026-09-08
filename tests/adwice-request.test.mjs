@@ -91,6 +91,62 @@ test("forwards a normalized lead and returns success", async () => {
   }
 });
 
+test("uses the selected currency's endpoint and token", async () => {
+  const originalFetch = globalThis.fetch;
+  let forwarded;
+  globalThis.fetch = async (url, init) => {
+    forwarded = { url, init };
+    return Response.json({ status: "success", data: [] });
+  };
+  try {
+    const response = await worker.fetch(
+      new Request("http://localhost/api/adwice/request", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: "Ada",
+          email: "ada@example.com",
+          url: "https://example.com",
+          plan: "plan_01",
+          currency: "EUR",
+        }),
+      }),
+      {
+        ADWICE_EUR_API_URL: "https://eu-api.adwice.example/leads",
+        ADWICE_EUR_API_TOKEN: "eu-token",
+      },
+      ctx,
+    );
+    assert.equal(response.status, 200);
+    assert.equal(forwarded.url, "https://eu-api.adwice.example/leads");
+    assert.equal(forwarded.init.headers.Authorization, "Bearer eu-token");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("rejects an unsupported currency", async () => {
+  const response = await worker.fetch(
+    new Request("http://localhost/api/adwice/request", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        name: "Ada",
+        email: "ada@example.com",
+        url: "https://example.com",
+        plan: "plan_01",
+        currency: "GBP",
+      }),
+    }),
+    {},
+    ctx,
+  );
+  assert.equal(response.status, 422);
+  assert.deepEqual((await response.json()).data.currency, [
+    "Select a valid currency.",
+  ]);
+});
+
 test("passes through Adwice 422 field errors", async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () =>

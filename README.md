@@ -12,10 +12,21 @@ Drizzle support.
 ## Adwice API
 
 Lead requests are sent to the same-origin `/api/adwice/request` Worker endpoint,
-which validates and forwards them to Adwice. Locally it defaults to
-`http://api.adbud.test`. In production, configure the Worker environment variable
-`ADWICE_API_BASE_URL` with the production API origin (without `/adbud/request`).
-This value is server-only; no API hostname or credentials enter the browser bundle.
+which validates and forwards them to Adwice. India visitors see INR pricing;
+everyone else can choose USD or EUR. The selected currency also selects the
+upstream lead destination.
+
+Configure these production Worker secrets, using the full request URL for each
+endpoint:
+
+- `ADWICE_INR_API_URL` and `ADWICE_INR_API_TOKEN`
+- `ADWICE_USD_API_URL` and `ADWICE_USD_API_TOKEN`
+- `ADWICE_EUR_API_URL` and `ADWICE_EUR_API_TOKEN`
+
+The URL and token never enter the browser bundle. `ADWICE_API_BASE_URL` and
+`ADWICE_API_TOKEN` remain optional legacy fallbacks for a market that does not
+yet have its own configuration; the base URL has the default registration path
+appended. Configure every market explicitly in production.
 
 Agency-demo requests are sent to `/api/agency-demo` and only send an SMTP
 notification to `care@myadwice.com`; they never call the Adwice registration

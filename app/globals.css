@@ -782,6 +782,24 @@ footer {
   font-size: 11px;
   color: #778087;
 }
+.currencySelect {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+  color: #59646d;
+  font-size: 12px;
+  font-weight: 700;
+}
+.currencySelect select {
+  border: 1px solid #dfe3e5;
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  padding: 7px 28px 7px 9px;
+}
 .platformGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

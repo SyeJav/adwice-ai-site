@@ -1,7 +1,9 @@
-/** Server-side defaults. Production can override the base URL with ADWICE_API_BASE_URL. */
+/**
+ * Server-side defaults. Configure each market's URL and token as Worker secrets;
+ * see README.md. ADWICE_API_BASE_URL remains a legacy fallback for local use.
+ */
 export const adwiceConfig = {
   apiBaseUrl: "http://api.adbud.test",
-  apiToken: "4FSj5rgDjy1d6c2YPKdXGMMsZgJa6P", // Set the registration API bearer token here.
   accountRequestPath: "/api/adbud/register",
   email: {
     host: "smtp.gmail.com",

@@ -6,10 +6,11 @@ import { SiteFooter } from "./components/site-footer";
 
 type Audience = "business" | "agency";
 type Platform = "search" | "meta" | "both";
-type Currency = "USD" | "INR";
+type Currency = "USD" | "EUR" | "INR";
 const platformPlans: Record<Platform, number> = { search: 0, meta: 1, both: 2 };
 const pricing = {
   USD: { min: 150, max: 10000, step: 100, start: 1000 },
+  EUR: { min: 140, max: 9200, step: 100, start: 900 },
   INR: { min: 3000, max: 300000, step: 500, start: 10000 },
 };
 const countries = [
@@ -29,6 +30,7 @@ export default function Home() {
   const [audience, setAudience] = useState<Audience>("business"),
     [platform, setPlatform] = useState<Platform | null>(null),
     [currency, setCurrency] = useState<Currency>("USD"),
+    [isIndia, setIsIndia] = useState(false),
     [budget, setBudget] = useState(pricing.USD.start),
     [sending, setSending] = useState(false),
     [sent, setSent] = useState(false),
@@ -38,16 +40,20 @@ export default function Home() {
     fee = plan?.monthlyPlatformFees[currency] ?? 0,
     dailyBudgetMicros = Math.round(budget / 30),
     money = (value: number) =>
-      new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", {
+      new Intl.NumberFormat(
+        currency === "INR" ? "en-IN" : currency === "EUR" ? "de-DE" : "en-US",
+        {
         style: "currency",
         currency,
         maximumFractionDigits: 0,
-      }).format(value);
+        },
+      ).format(value);
   useEffect(() => {
     fetch("/api/geo")
       .then((r) => r.json() as Promise<{ country?: string }>)
       .then((d) => {
         if (d.country === "IN") {
+          setIsIndia(true);
           setCurrency("INR");
         }
       })
@@ -91,6 +97,7 @@ export default function Home() {
                   budget: dailyBudgetMicros,
                   language: navigator.language.split("-")[0] || null,
                   plan: data.get("plan"),
+                  currency: data.get("currency"),
                   promotion: null,
                   requestType: "business",
                 },
@@ -237,12 +244,25 @@ export default function Home() {
                   <h2>Choose where to advertise</h2>
                 </div>
                 <span>
-                  {currency === "INR"
-                    ? "India pricing · INR"
-                    : "International pricing · USD"}{" "}
-                  · Platform fee shown separately
+                  {isIndia ? "India pricing · INR" : "International pricing"}
+                  {" · Platform fee shown separately"}
                 </span>
               </div>
+              {!isIndia && (
+                <label className="currencySelect" htmlFor="currency">
+                  Currency
+                  <select
+                    id="currency"
+                    value={currency}
+                    onChange={(event) =>
+                      setCurrency(event.target.value as "USD" | "EUR")
+                    }
+                  >
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                  </select>
+                </label>
+              )}
               <div className="platformGrid">
                 {(Object.keys(platformPlans) as Platform[]).map((key) => {
                   const item = adwicePlans[platformPlans[key]];
@@ -317,6 +337,7 @@ export default function Home() {
               <LeadForm
                 business
                 plan={plan?.id || ""}
+                currency={currency}
                 onSubmit={submit}
                 sending={sending}
                 sent={sent}
@@ -343,6 +364,7 @@ export default function Home() {
           </div>
           <LeadForm
             plan=""
+            currency={currency}
             onSubmit={submit}
             sending={sending}
             sent={sent}
@@ -358,6 +380,7 @@ export default function Home() {
 function LeadForm({
   business = false,
   plan,
+  currency,
   onSubmit,
   sending,
   sent,
@@ -365,6 +388,7 @@ function LeadForm({
 }: {
   business?: boolean;
   plan: string;
+  currency: Currency;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   sending: boolean;
   sent: boolean;
@@ -417,7 +441,10 @@ function LeadForm({
         )}
       </div>
       {business ? (
-        <input type="hidden" name="plan" value={plan} />
+        <>
+          <input type="hidden" name="plan" value={plan} />
+          <input type="hidden" name="currency" value={currency} />
+        </>
       ) : (
         <label>
           Tell us about your agency

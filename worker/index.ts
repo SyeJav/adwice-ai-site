@@ -11,6 +11,13 @@ interface Env {
   ASSETS: Fetcher;
   DB: D1Database;
   ADWICE_API_BASE_URL?: string;
+  ADWICE_API_TOKEN?: string;
+  ADWICE_INR_API_URL?: string;
+  ADWICE_INR_API_TOKEN?: string;
+  ADWICE_USD_API_URL?: string;
+  ADWICE_USD_API_TOKEN?: string;
+  ADWICE_EUR_API_URL?: string;
+  ADWICE_EUR_API_TOKEN?: string;
   ADWICE_SMTP_PASSWORD?: string;
   IMAGES: {
     input(stream: ReadableStream): {
