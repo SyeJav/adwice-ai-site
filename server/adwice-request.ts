@@ -1,5 +1,5 @@
 import { adwiceConfig } from "../config/adwice";
-import { resolveAdwiceEnv, type AdwiceEnv } from "../config/adwice-env";
+import type { AdwiceEnv } from "../config/adwice-env";
 import { adwicePlans } from "../config/adwice-plans";
 import { sendAgencyLeadEmail } from "./adwice-email";
 
@@ -130,7 +130,7 @@ export async function handleAgencyDemoRequest(
   request: Request,
   bindings: AdwiceEnv,
 ): Promise<Response> {
-  const env = resolveAdwiceEnv(bindings);
+  const env = bindings;
   if (request.method !== "POST")
     return new Response(null, { status: 405, headers: { Allow: "POST" } });
   let input: Record<string, unknown>;
@@ -195,7 +195,7 @@ export async function handleAdwiceRequest(
   request: Request,
   bindings: AdwiceEnv,
 ): Promise<Response> {
-  const env = resolveAdwiceEnv(bindings);
+  const env = bindings;
   if (request.method !== "POST")
     return new Response(null, { status: 405, headers: { Allow: "POST" } });
   let input: Record<string, unknown>;
@@ -262,7 +262,11 @@ export async function handleAdwiceRequest(
     const data = await upstream.json().catch(() => null);
     if (upstream.status === 422 && data && typeof data === "object")
       return json(data, 422);
-    if (!upstream.ok || !data || typeof data !== "object")
+    if (!upstream.ok || !data || typeof data !== "object") {
+      console.error("Adwice API returned an unexpected response.", {
+        status: upstream.status,
+        currency: currencyFrom(input),
+      });
       return json(
         {
           status: "error",
@@ -270,8 +274,10 @@ export async function handleAdwiceRequest(
         },
         502,
       );
+    }
     return json(data, upstream.status);
-  } catch {
+  } catch (error) {
+    console.error("Adwice API request failed.", error);
     return json(
       {
         status: "error",

@@ -1,4 +1,4 @@
-import { handleAgencyDemoRequest } from "../../../worker/adwice-request";
+import { handleAgencyDemoRequest } from "../../../server/adwice-request";
 import { getNodeAdwiceEnv } from "../adwice-env";
 
 export const dynamic = "force-dynamic";

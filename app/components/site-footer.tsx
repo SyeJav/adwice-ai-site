@@ -1,24 +1,25 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export function SiteFooter() {
   return (
     <footer className="shell">
       <div className="footerBrand">
-        <a className="brand" href="/">
+        <Link className="brand" href="/">
           <Image
             src="/brand/adwice-with-text.svg"
             alt="Adwice"
             width={247}
             height={86}
           />
-        </a>
+        </Link>
         <p>AI-powered campaign strategy, optimization, and reporting.</p>
       </div>
       <nav className="footerLinks" aria-label="Legal links">
-        <a href="/privacy-policy">Privacy Policy</a>
-        <a href="/terms-of-service">Terms of Service</a>
-        <a href="/cancellation-policy">Cancellation Policy</a>
-        <a href="/shipping-and-delivery">Shipping and Delivery</a>
+        <Link href="/privacy-policy">Privacy Policy</Link>
+        <Link href="/terms-of-service">Terms of Service</Link>
+        <Link href="/cancellation-policy">Cancellation Policy</Link>
+        <Link href="/shipping-and-delivery">Shipping and Delivery</Link>
       </nav>
       <div className="footerContact">
         <div className="socialLinks" role="group" aria-label="Follow Adwice">

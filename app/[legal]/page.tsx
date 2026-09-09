@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "../components/site-footer";
 
@@ -184,22 +185,22 @@ export default async function LegalPage({
   return (
     <>
       <header className="nav shell">
-        <a className="brand" href="/">
+        <Link className="brand" href="/">
           <Image
             src="/brand/adwice-with-text.svg"
             alt="Adwice"
             width={247}
             height={86}
           />
-        </a>
+        </Link>
         <nav>
-          <a href="/#how">How it works</a>
-          <a href="/#benefits">Why Adwice</a>
-          <a href="/#contact">Contact</a>
+          <Link href="/#how">How it works</Link>
+          <Link href="/#benefits">Why Adwice</Link>
+          <Link href="/#contact">Contact</Link>
         </nav>
-        <a className="navCta" href="/#contact">
+        <Link className="navCta" href="/#contact">
           Get started
-        </a>
+        </Link>
       </header>
       <main className="legalPage">
         <section className="legalHero">

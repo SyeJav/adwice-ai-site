@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import Image from "next/image";
 import { adwicePlans } from "../config/adwice-plans";
 import { SiteFooter } from "./components/site-footer";
@@ -30,7 +30,6 @@ export default function Home() {
   const [audience, setAudience] = useState<Audience>("business"),
     [platform, setPlatform] = useState<Platform | null>(null),
     [currency, setCurrency] = useState<Currency>("USD"),
-    [isIndia, setIsIndia] = useState(false),
     [budget, setBudget] = useState(pricing.USD.start),
     [sending, setSending] = useState(false),
     [sent, setSent] = useState(false),
@@ -48,20 +47,10 @@ export default function Home() {
         maximumFractionDigits: 0,
         },
       ).format(value);
-  useEffect(() => {
-    fetch("/api/geo")
-      .then((r) => r.json() as Promise<{ country?: string }>)
-      .then((d) => {
-        if (d.country === "IN") {
-          setIsIndia(true);
-          setCurrency("INR");
-        }
-      })
-      .catch(() => undefined);
-  }, []);
-  useEffect(() => {
-    if (plan) setBudget(plan.default_budget[currency] * 30);
-  }, [currency, plan]);
+  const selectCurrency = (nextCurrency: Currency) => {
+    setCurrency(nextCurrency);
+    if (plan) setBudget(plan.default_budget[nextCurrency] * 30);
+  };
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (sending) return;
@@ -244,25 +233,23 @@ export default function Home() {
                   <h2>Choose where to advertise</h2>
                 </div>
                 <span>
-                  {isIndia ? "India pricing · INR" : "International pricing"}
-                  {" · Platform fee shown separately"}
+                  Currency selected below · Platform fee shown separately
                 </span>
               </div>
-              {!isIndia && (
-                <label className="currencySelect" htmlFor="currency">
-                  Currency
-                  <select
-                    id="currency"
-                    value={currency}
-                    onChange={(event) =>
-                      setCurrency(event.target.value as "USD" | "EUR")
-                    }
-                  >
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                  </select>
-                </label>
-              )}
+              <label className="currencySelect" htmlFor="currency">
+                Currency
+                <select
+                  id="currency"
+                  value={currency}
+                  onChange={(event) =>
+                    selectCurrency(event.target.value as Currency)
+                  }
+                >
+                  <option value="INR">INR (₹)</option>
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                </select>
+              </label>
               <div className="platformGrid">
                 {(Object.keys(platformPlans) as Platform[]).map((key) => {
                   const item = adwicePlans[platformPlans[key]];
@@ -271,7 +258,10 @@ export default function Home() {
                       type="button"
                       className={platform === key ? "selected" : ""}
                       aria-pressed={platform === key}
-                      onClick={() => setPlatform(key)}
+                      onClick={() => {
+                        setPlatform(key);
+                        setBudget(item.default_budget[currency] * 30);
+                      }}
                       key={key}
                     >
                       <span className="radioDot" />
