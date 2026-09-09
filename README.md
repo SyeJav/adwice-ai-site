@@ -16,23 +16,28 @@ which validates and forwards them to Adwice. India visitors see INR pricing;
 everyone else can choose USD or EUR. The selected currency also selects the
 upstream lead destination.
 
-Configure these production Worker secrets, using the full request URL for each
-endpoint:
+Copy `.env.example` to `.env` (or `.env.production` on the build host) and set
+the endpoint URLs, tokens, and SMTP values there. These files are ignored by
+Git. The build reads only the listed `ADWICE_*` variables and embeds them in the
+server Worker bundle; they are not made available to browser code. Rebuild and
+redeploy after changing a value. No Cloudflare Worker secret or variable is
+required.
+
+Configure one full request URL and token for each market:
 
 - `ADWICE_INR_API_URL` and `ADWICE_INR_API_TOKEN`
 - `ADWICE_USD_API_URL` and `ADWICE_USD_API_TOKEN`
 - `ADWICE_EUR_API_URL` and `ADWICE_EUR_API_TOKEN`
 
-The URL and token never enter the browser bundle. `ADWICE_API_BASE_URL` and
-`ADWICE_API_TOKEN` remain optional legacy fallbacks for a market that does not
-yet have its own configuration; the base URL has the default registration path
-appended. Configure every market explicitly in production.
+`ADWICE_API_BASE_URL` and `ADWICE_API_TOKEN` are optional fallbacks for a market
+without its own configuration; the base URL has the registration path appended.
+Set `ADWICE_ACCOUNT_REQUEST_PATH` when that path differs from the default.
 
 Agency-demo requests are sent to `/api/agency-demo` and only send an SMTP
-notification to `care@myadwice.com`; they never call the Adwice registration
-API. Configure `ADWICE_SMTP_PASSWORD` as a secret Worker binding in production
-with a Gmail App Password for `myadwice@gmail.com`. Never add that password to
-source control.
+notification to the `ADWICE_SMTP_RECIPIENT`; they never call the Adwice
+registration API. Set `ADWICE_SMTP_PASSWORD` and the other `ADWICE_SMTP_*`
+settings in `.env`. For Gmail, use an App Password. Never add the populated
+file to source control.
 
 ## Sites Lifecycle
 

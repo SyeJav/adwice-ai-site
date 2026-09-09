@@ -1,18 +1,9 @@
 import { adwiceConfig } from "../config/adwice";
+import { resolveAdwiceEnv, type AdwiceEnv } from "../config/adwice-env";
 import { adwicePlans } from "../config/adwice-plans";
 import { sendAgencyLeadEmail } from "./adwice-email";
 
-export interface AdwiceEnv {
-  ADWICE_API_BASE_URL?: string;
-  ADWICE_API_TOKEN?: string;
-  ADWICE_INR_API_URL?: string;
-  ADWICE_INR_API_TOKEN?: string;
-  ADWICE_USD_API_URL?: string;
-  ADWICE_USD_API_TOKEN?: string;
-  ADWICE_EUR_API_URL?: string;
-  ADWICE_EUR_API_TOKEN?: string;
-  ADWICE_SMTP_PASSWORD?: string;
-}
+export type { AdwiceEnv } from "../config/adwice-env";
 type FieldErrors = Record<string, string[]>;
 type Currency = "INR" | "USD" | "EUR";
 const currencies: readonly Currency[] = ["INR", "USD", "EUR"];
@@ -43,7 +34,7 @@ function apiConfigFor(currency: Currency, env: AdwiceEnv) {
   return {
     url:
       marketConfig.url ||
-      `${(env.ADWICE_API_BASE_URL || adwiceConfig.apiBaseUrl).replace(/\/$/, "")}${adwiceConfig.accountRequestPath}`,
+      `${(env.ADWICE_API_BASE_URL || adwiceConfig.apiBaseUrl).replace(/\/$/, "")}${env.ADWICE_ACCOUNT_REQUEST_PATH || adwiceConfig.accountRequestPath}`,
     token: marketConfig.token || env.ADWICE_API_TOKEN,
   };
 }
@@ -137,8 +128,9 @@ function validate(body: Record<string, unknown>): FieldErrors {
 
 export async function handleAgencyDemoRequest(
   request: Request,
-  env: AdwiceEnv,
+  bindings: AdwiceEnv,
 ): Promise<Response> {
+  const env = resolveAdwiceEnv(bindings);
   if (request.method !== "POST")
     return new Response(null, { status: 405, headers: { Allow: "POST" } });
   let input: Record<string, unknown>;
@@ -161,7 +153,12 @@ export async function handleAgencyDemoRequest(
       },
       422,
     );
-  if (!env.ADWICE_SMTP_PASSWORD)
+  if (
+    !env.ADWICE_SMTP_PASSWORD ||
+    !env.ADWICE_SMTP_USERNAME ||
+    !env.ADWICE_SMTP_FROM_ADDRESS ||
+    !env.ADWICE_SMTP_RECIPIENT
+  )
     return json(
       { status: "error", message: "Email service is not configured right now." },
       503,
@@ -180,7 +177,7 @@ export async function handleAgencyDemoRequest(
         : null,
   };
   try {
-    await sendAgencyLeadEmail(lead, env.ADWICE_SMTP_PASSWORD);
+    await sendAgencyLeadEmail(lead, env);
     return json(
       { status: "success", message: "Your agency request was received." },
       200,
@@ -196,8 +193,9 @@ export async function handleAgencyDemoRequest(
 
 export async function handleAdwiceRequest(
   request: Request,
-  env: AdwiceEnv,
+  bindings: AdwiceEnv,
 ): Promise<Response> {
+  const env = resolveAdwiceEnv(bindings);
   if (request.method !== "POST")
     return new Response(null, { status: 405, headers: { Allow: "POST" } });
   let input: Record<string, unknown>;

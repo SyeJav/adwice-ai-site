@@ -17,7 +17,7 @@ export const adwicePlans = [
     id: "plan_03",
     label: "Search + Social Ads",
     description: "Capture demand and create more of it",
-    monthlyPlatformFees: { USD: 69, EUR: 63, INR: 5999 },
+    monthlyPlatformFees: { USD: 69, EUR: 60, INR: 5999 },
     default_budget: { USD: 10, EUR: 9, INR: 300 },
   },
 ] as const;
