@@ -37,6 +37,8 @@ export default function Home() {
   const price = pricing[currency],
     plan = platform ? adwicePlans[platformPlans[platform]] : null,
     fee = plan?.monthlyPlatformFees[currency] ?? 0,
+    subtotal = budget + fee,
+    gst = currency === "INR" ? Math.round(subtotal * 0.18) : 0,
     dailyBudgetMicros = Math.round(budget / 30),
     money = (value: number) =>
       new Intl.NumberFormat(
@@ -87,7 +89,7 @@ export default function Home() {
                   language: navigator.language.split("-")[0] || null,
                   plan: data.get("plan"),
                   currency: data.get("currency"),
-                  promotion: null,
+                  promotion: data.get("promotion") || null,
                   requestType: "business",
                 },
           ),
@@ -311,9 +313,15 @@ export default function Home() {
                       <dt>Platform fee</dt>
                       <dd>{plan ? money(fee) : "Select"}</dd>
                     </div>
+                    {currency === "INR" && (
+                      <div>
+                        <dt>GST (18%)</dt>
+                        <dd>{plan ? money(gst) : "Select"}</dd>
+                      </div>
+                    )}
                     <div className="total">
                       <dt>Total / month</dt>
-                      <dd>{plan ? money(budget + fee) : "—"}</dd>
+                      <dd>{plan ? money(subtotal + gst) : "—"}</dd>
                     </div>
                   </dl>
                 </div>
@@ -410,19 +418,25 @@ function LeadForm({
           <input name="email" required type="email" autoComplete="email" />
         </label>
         {business ? (
-          <label>
-            Country
-            <select name="country" required defaultValue="">
-              <option value="" disabled>
-                Select your country
-              </option>
-              {countries.map(([code, name]) => (
-                <option key={code} value={code}>
-                  {name}
+          <>
+            <label>
+              Country
+              <select name="country" required defaultValue="">
+                <option value="" disabled>
+                  Select your country
                 </option>
-              ))}
-            </select>
-          </label>
+                {countries.map(([code, name]) => (
+                  <option key={code} value={code}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Promotion Code <span className="optional">Optional</span>
+              <input name="promotion" autoComplete="off" />
+            </label>
+          </>
         ) : (
           <label>
             Phone <span className="optional">Optional</span>
