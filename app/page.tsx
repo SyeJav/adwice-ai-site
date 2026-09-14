@@ -133,6 +133,7 @@ export default function Home() {
         <nav>
           <a href="#how">How it works</a>
           <a href="#benefits">Why Adwice</a>
+          <a href="/platform">Features</a>
           <a href="#contact">Contact</a>
         </nav>
         <a className="navCta" href="#contact">
@@ -195,14 +196,7 @@ export default function Home() {
           <ProductCard audience={audience} money={money} />
         </div>
       </section>
-      <section className="outcome shell" id="how">
-        <p className="sectionTag">One focused workflow</p>
-        <h2>More calls, leads, bookings, and sales</h2>
-        <p className="sectionIntro">
-          Choose your goal, review the strategy, then launch and improve.
-        </p>
-        <WorkflowSteps audience={audience} />
-      </section>
+      <DetailedHowItWorks />
       <section className="benefitSection" id="benefits">
         <div className="shell">
           <div className="sectionHead">
@@ -216,6 +210,7 @@ export default function Home() {
         </div>
       </section>
       <Quote />
+      {audience === "agency" && <AgencyWhiteLabel />}
       {audience === "business" && (
         <>
           <section className="finalCta shell business" id="contact">
@@ -586,6 +581,36 @@ function Quote() {
   );
 }
 
+function AgencyWhiteLabel() {
+  const items = [
+    "Custom domain, logo, and brand colours",
+    "Separate login portals for each client",
+    "White-labelled automated performance reports",
+    "Reseller pricing — set your own margin",
+    "API access for custom integrations",
+  ];
+  return (
+    <section className="agencyWhiteLabel">
+      <div className="shell agencyWhiteLabelInner">
+        <div>
+          <p className="sectionTag">Agency white-label</p>
+          <h2>Fully branded client platform.</h2>
+          <p>
+            The complete Adwice platform under your brand. Your clients see
+            your logo, your domain, and your colours, while you deliver a
+            powerful AI advertising service without building it yourself.
+          </p>
+        </div>
+        <ul>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 function ProofRow({ audience }: { audience: Audience }) {
   const items =
     audience === "business"
@@ -611,52 +636,97 @@ function ProofRow({ audience }: { audience: Audience }) {
   );
 }
 
-function WorkflowSteps({ audience }: { audience: Audience }) {
-  const steps =
-    audience === "business"
-      ? [
-          [
-            "01",
-            "Share your goal",
-            "Tell us what you sell, where you sell it, and the result you want.",
-          ],
-          [
-            "02",
-            "Review the strategy",
-            "See the campaign, targeting, creative, and budget before launch.",
-          ],
-          [
-            "03",
-            "Launch and improve",
-            "Track meaningful results while Adwice finds waste and opportunities.",
-          ],
-        ]
-      : [
-          [
-            "01",
-            "Brand your platform",
-            "Use your logo, colours, domain, and client-facing experience.",
-          ],
-          [
-            "02",
-            "Onboard every account",
-            "Capture goals and launch consistent campaigns through one workflow.",
-          ],
-          [
-            "03",
-            "Scale with oversight",
-            "Review recommendations, approve changes, and report across your portfolio.",
-          ],
-        ];
+function DetailedHowItWorks() {
+  const steps = [
+    [
+      "1",
+      "Tell us about your business",
+      "Answer 3–5 simple questions: what you sell, who your customers are, and what result you want from your ads — more calls, website visits, or store visits. No marketing jargon required.",
+    ],
+    [
+      "2",
+      "AI builds your complete campaign",
+      "Our AI instantly generates ad copy, headlines, keywords, audience targeting, bidding strategy, and creatives — tailored specifically to your business and goal.",
+    ],
+    [
+      "3",
+      "Review, approve, and go live",
+      "You get a simple preview of your campaign. Review the ads in plain language, make any changes you want, then approve.",
+    ],
+    [
+      "4",
+      "We launch and optimize for you",
+      "We handle the entire launch. Once live, our AI continuously monitors and optimizes your campaigns automatically to get the best possible results.",
+    ],
+    [
+      "5",
+      "Get clear, jargon-free reports",
+      "Receive easy-to-understand performance reports. See clicks, calls, or visits your ads generated — in plain English, not marketing speak.",
+    ],
+  ];
   return (
-    <div className="steps">
-      {steps.map(([number, title, copy]) => (
-        <article key={number}>
-          <span>{number}</span>
-          <h3>{title}</h3>
-          <p>{copy}</p>
-        </article>
-      ))}
-    </div>
+    <section className="platformHow shell" id="how">
+      <div className="platformIntro">
+        <p className="sectionTag">How it works</p>
+        <h2>From zero to live ads in under 5 minutes.</h2>
+        <p>
+          No technical setup. No prior experience. No ad account. Answer a few
+          questions and let our AI do the heavy lifting.
+        </p>
+      </div>
+      <div className="platformHowGrid">
+        <div className="platformSteps">
+          {steps.map(([number, title, copy]) => (
+            <article key={number}>
+              <span>{number}</span>
+              <div>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="campaignPreview">
+          <div className="campaignPreviewTop">
+            <span>
+              <Image
+                className="miniLogo"
+                src="/brand/adwice-logo.svg"
+                alt=""
+                width={24}
+                height={24}
+              />
+              Campaign preview
+            </span>
+            <em>Ready to review</em>
+          </div>
+          <div className="previewField">
+            <small>Business</small>
+            <strong>Mario&apos;s Pizza · Local restaurant, Naples</strong>
+          </div>
+          <div className="previewField">
+            <small>Goal</small>
+            <strong>Get more phone calls from nearby customers</strong>
+          </div>
+          <div className="previewField">
+            <small>Monthly budget</small>
+            <strong>$300 / month</strong>
+          </div>
+          <div className="adPreview">
+            <small>AI-generated Google ad</small>
+            <b>Best Pizza in Naples — Call Now</b>
+            <p>
+              Authentic Italian pizza, fresh ingredients, and quick delivery.
+              Order online and get 15% off your first order.
+            </p>
+          </div>
+          <div className="previewPills">
+            <span>Google Search</span>
+            <span>Meta Feed</span>
+          </div>
+          <p className="previewLive">Campaign is live — 247 clicks this week</p>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -605,6 +605,332 @@ footer {
   color: var(--orange);
   font-weight: 900;
 }
+.platformHero {
+  padding: 78px 0 94px;
+  background: var(--cream);
+  border-radius: 0 0 48px 48px;
+  text-align: center;
+}
+.platformHero .heroCopy {
+  max-width: 630px;
+}
+.platformHow {
+  padding: 105px 0;
+}
+.platformIntro {
+  max-width: 650px;
+}
+.platformIntro h2,
+.platformFeatures h2,
+.platformsCover h2,
+.agencyWhiteLabel h2 {
+  font-family: Georgia, serif;
+  font-size: clamp(36px, 4.5vw, 58px);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  margin: 15px 0;
+}
+.platformIntro > p:last-child,
+.platformSectionIntro {
+  color: var(--muted);
+  line-height: 1.7;
+}
+.platformHowGrid {
+  display: grid;
+  grid-template-columns: 1fr 0.82fr;
+  gap: 74px;
+  align-items: start;
+  margin-top: 52px;
+}
+.platformSteps article {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 16px;
+  padding: 0 0 26px;
+}
+.platformSteps article > span {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border: 1px solid #d7dde0;
+  border-radius: 50%;
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 800;
+}
+.platformSteps article:first-child > span {
+  color: #fff;
+  background: var(--orange);
+  border-color: var(--orange);
+}
+.platformSteps h3 {
+  margin: 5px 0 8px;
+}
+.platformSteps p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+.campaignPreview {
+  padding: 20px;
+  border: 1px solid #d9dedf;
+  border-radius: 16px;
+  background: #fafbfb;
+  box-shadow: 0 20px 60px #24303b12;
+}
+.campaignPreviewTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 16px;
+  border-bottom: 1px solid #e4e9eb;
+  font-size: 12px;
+  font-weight: 800;
+}
+.campaignPreviewTop > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.campaignPreviewTop em {
+  padding: 5px 9px;
+  border-radius: 99px;
+  color: #1c9666;
+  background: #eaf8f1;
+  font-size: 10px;
+  font-style: normal;
+}
+.previewField,
+.adPreview {
+  padding: 12px;
+  margin-top: 10px;
+  border: 1px solid #e1e6e8;
+  border-radius: 9px;
+  background: #fff;
+}
+.previewField small,
+.adPreview small {
+  display: block;
+  margin-bottom: 4px;
+  color: #7b848a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.previewField strong {
+  font-size: 12px;
+}
+.adPreview b {
+  display: block;
+  color: #1a0dab;
+  font-size: 14px;
+}
+.adPreview p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.previewPills {
+  display: flex;
+  gap: 7px;
+  margin-top: 12px;
+}
+.previewPills span {
+  padding: 5px 8px;
+  border-radius: 99px;
+  color: #4267b2;
+  background: #edf3ff;
+  font-size: 10px;
+  font-weight: 700;
+}
+.previewLive {
+  margin: 13px 0 0;
+  color: #1c9666;
+  font-size: 11px;
+  font-weight: 700;
+}
+.platformFeatures {
+  padding: 105px 0;
+  background: #f7f8f8;
+}
+.platformFeatures .platformSectionIntro,
+.platformsCover .platformSectionIntro {
+  max-width: 620px;
+  margin: 0;
+}
+.platformFeatureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 45px;
+}
+.platformFeatureGrid article {
+  min-height: 266px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+.platformFeatureGrid article.featured {
+  color: #fff;
+  border-color: var(--orange);
+  background: var(--orange);
+}
+.platformFeatureGrid > article > span {
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 800;
+}
+.platformFeatureGrid article.featured > span {
+  color: #fff;
+}
+.platformFeatureGrid h3 {
+  margin: 20px 0 10px;
+  font-family: Georgia, serif;
+  font-size: 22px;
+  font-weight: 500;
+}
+.platformFeatureGrid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.platformFeatureGrid .featured p {
+  color: #fff4ef;
+}
+.platformFeatureGrid article > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 17px;
+}
+.platformFeatureGrid b {
+  padding: 5px 7px;
+  border: 1px solid #e0e5e7;
+  border-radius: 99px;
+  color: #66727a;
+  background: #fafbfb;
+  font-size: 9px;
+}
+.platformFeatureGrid .featured b {
+  border-color: #ffffff73;
+  color: #fff;
+  background: #ffffff24;
+}
+.platformsCover {
+  padding: 105px 0;
+  color: #fff;
+  background: var(--dark);
+}
+.platformsCover .sectionTag {
+  color: #ef896d;
+}
+.platformsCover .platformSectionIntro {
+  color: #aeb7c0;
+}
+.platformCoverGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 45px;
+}
+.platformCoverGrid article {
+  padding: 28px;
+  border: 1px solid #263441;
+  border-radius: 12px;
+  background: #16222d;
+}
+.platformBadge {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 17px;
+  border-radius: 9px;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
+}
+.badge1 { background: #4285f4; }
+.badge2 { background: #1877f2; }
+.badge3 { background: #1c9666; }
+.badge4 { background: var(--orange); }
+.platformCoverGrid h3 {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 23px;
+  font-weight: 500;
+}
+.platformCoverGrid small {
+  display: block;
+  margin-top: 4px;
+  color: #ef896d;
+  font-size: 11px;
+  font-weight: 700;
+}
+.platformCoverGrid p {
+  margin: 19px 0;
+  color: #aeb7c0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.platformCoverGrid ul,
+.agencyWhiteLabel ul {
+  display: grid;
+  gap: 9px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.platformCoverGrid li,
+.agencyWhiteLabel li {
+  display: flex;
+  gap: 8px;
+  color: #d8e0e5;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.platformCoverGrid li::before,
+.agencyWhiteLabel li::before {
+  content: "✓";
+  color: var(--orange);
+  font-weight: 900;
+}
+.agencyWhiteLabel {
+  padding: 0 0 95px;
+}
+.agencyWhiteLabelInner {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: 80px;
+  padding: 54px;
+  border-radius: 20px;
+  color: #fff;
+  background: var(--purple);
+}
+.agencyWhiteLabel .sectionTag {
+  color: #ffffffa8;
+}
+.agencyWhiteLabel h2 {
+  margin-top: 10px;
+}
+.agencyWhiteLabelInner > div > p:last-child {
+  max-width: 630px;
+  margin: 0;
+  color: #ffffffcf;
+  line-height: 1.7;
+}
+.agencyWhiteLabel li {
+  color: #fff;
+}
+.agencyWhiteLabel li::before {
+  color: #fff;
+}
 @media (max-width: 760px) {
   .shell {
     width: min(100% - 28px, 1160px);
@@ -713,6 +1039,38 @@ footer {
   }
   .legalContent {
     padding: 48px 0 22px;
+  }
+  .platformHero {
+    padding: 52px 0 64px;
+    border-radius: 0 0 28px 28px;
+  }
+  .platformHow,
+  .platformFeatures,
+  .platformsCover {
+    padding: 75px 0;
+  }
+  .platformHowGrid,
+  .platformFeatureGrid,
+  .platformCoverGrid,
+  .agencyWhiteLabelInner {
+    grid-template-columns: 1fr;
+  }
+  .platformHowGrid,
+  .agencyWhiteLabelInner {
+    gap: 35px;
+  }
+  .platformFeatureGrid article {
+    min-height: 0;
+  }
+  .campaignPreview {
+    padding: 16px;
+  }
+  .agencyWhiteLabel {
+    padding: 0 0 65px;
+  }
+  .agencyWhiteLabelInner {
+    padding: 34px 25px;
+    border-radius: 0;
   }
   .brand {
     justify-content: center;
