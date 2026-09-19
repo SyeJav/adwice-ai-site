@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 export const metadata: Metadata = {
   title: "Adwice | AI-Powered Google & Meta Advertising",
@@ -50,6 +51,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18454790985"
+          strategy="beforeInteractive"
+        />
+        <Script id="google-ads-tag" strategy="beforeInteractive">
+          {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'AW-18454790985');
+              gtag('config', 'AW-18454790985/FTeFCO_n1_kcEMmG999E', {
+                'phone_conversion_number': '07011410689'
+              });
+            `}
+        </Script>
+      </head>
       <body>
         <script
           type="application/ld+json"

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "../components/site-footer";
+import { WhatsAppLink } from "../components/whatsapp-link";
 
 type LegalSection = {
   title: string;
@@ -198,9 +199,12 @@ export default async function LegalPage({
           <Link href="/#benefits">Why Adwice</Link>
           <Link href="/#contact">Contact</Link>
         </nav>
-        <Link className="navCta" href="/#contact">
-          Get started
-        </Link>
+        <div className="navActions">
+          <WhatsAppLink />
+          <Link className="navCta" href="/#contact">
+            Get started
+          </Link>
+        </div>
       </header>
       <main className="legalPage">
         <section className="legalHero">

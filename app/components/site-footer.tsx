@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { WhatsAppLink } from "./whatsapp-link";
 
 export function SiteFooter() {
   return (
@@ -22,6 +23,10 @@ export function SiteFooter() {
         <Link href="/shipping-and-delivery">Shipping and Delivery</Link>
       </nav>
       <div className="footerContact">
+        <WhatsAppLink
+          className="whatsappButton footerWhatsapp"
+          label="Chat on WhatsApp"
+        />
         <div className="socialLinks" role="group" aria-label="Follow Adwice">
           <a
             href="https://www.linkedin.com/company/adwice-technologies/"
@@ -49,6 +54,16 @@ export function SiteFooter() {
           </a>
         </div>
         <a href="mailto:care@myadwice.com">care@myadwice.com</a>
+        <div className="footerPhones" aria-label="Phone numbers">
+          <a href="tel:+46761889848">
+            <span aria-hidden="true">🇸🇪</span>
+            <span>Sweden: 0761889848</span>
+          </a>
+          <a href="tel:+917011410689">
+            <span aria-hidden="true">🇮🇳</span>
+            <span>India: 7011410689</span>
+          </a>
+        </div>
         <span>© 2026 Adwice</span>
       </div>
     </footer>

@@ -3,6 +3,13 @@ import { FormEvent, useState } from "react";
 import Image from "next/image";
 import { adwicePlans } from "../config/adwice-plans";
 import { SiteFooter } from "./components/site-footer";
+import { WhatsAppLink } from "./components/whatsapp-link";
+
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
 
 type Audience = "business" | "agency";
 type Platform = "search" | "meta" | "both";
@@ -101,6 +108,10 @@ export default function Home() {
         } | null;
       if (!response.ok || result?.status !== "success")
         throw new Error(result?.message);
+      window.gtag?.("event", "conversion", {
+        send_to: "AW-18454790985/-7nOCNzQ2PkcEMmG999E",
+        value: 1.0,
+      });
       setSent(true);
       form.reset();
     } catch (error) {
@@ -136,9 +147,12 @@ export default function Home() {
           <a href="/platform">Features</a>
           <a href="#contact">Contact</a>
         </nav>
-        <a className="navCta" href="#contact">
-          {audience === "agency" ? "Agency demo" : "Get started"}
-        </a>
+        <div className="navActions">
+          <WhatsAppLink />
+          <a className="navCta" href="#contact">
+            {audience === "agency" ? "Agency demo" : "Get started"}
+          </a>
+        </div>
       </header>
       <section className={`hero ${audience}`} id="top">
         <div className="shell heroInner">

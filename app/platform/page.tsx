@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
+import { WhatsAppLink } from "../components/whatsapp-link";
 
 export const metadata = {
   title: "Platform | Adwice",
@@ -39,7 +40,10 @@ export default function PlatformPage() {
           <a href="/platform">Features</a>
           <a href="/#contact">Contact</a>
         </nav>
-        <Link className="navCta" href="/#contact">Get started</Link>
+        <div className="navActions">
+          <WhatsAppLink />
+          <Link className="navCta" href="/#contact">Get started</Link>
+        </div>
       </header>
 
       <section className="platformHero">
