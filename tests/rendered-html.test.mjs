@@ -28,3 +28,17 @@ test("includes the Google Ads tag on every page", async (t) => {
     assert.match(html, /India: 7011410689/);
   }
 });
+
+test("includes the Meta Pixel on every page", async (t) => {
+  const server = await startServer();
+  t.after(server.close);
+
+  for (const path of ["/", "/platform", "/privacy-policy"]) {
+    const response = await fetch(`${server.baseUrl}${path}`);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, /connect\.facebook\.net\/en_US\/fbevents\.js/);
+    assert.match(html, /fbq\('init', '2015224922626516'\)/);
+    assert.match(html, /facebook\.com\/tr\?id=2015224922626516/);
+  }
+});

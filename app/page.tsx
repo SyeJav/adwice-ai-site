@@ -8,6 +8,7 @@ import { WhatsAppLink } from "./components/whatsapp-link";
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
+    fbq?: (...args: unknown[]) => void;
   }
 }
 
@@ -111,6 +112,9 @@ export default function Home() {
       window.gtag?.("event", "conversion", {
         send_to: "AW-18454790985/-7nOCNzQ2PkcEMmG999E",
         value: 1.0,
+      });
+      window.fbq?.("track", "Lead", {
+        content_name: "Adwice Lead Form",
       });
       setSent(true);
       form.reset();
