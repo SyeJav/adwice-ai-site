@@ -1,7 +1,7 @@
 "use client";
 import { FormEvent, useState } from "react";
 import Image from "next/image";
-import { adwicePlans } from "../config/adwice-plans";
+import { adwicePlans, type AdwicePlanId } from "../config/adwice-plans";
 import { SiteFooter } from "./components/site-footer";
 import { WhatsAppLink } from "./components/whatsapp-link";
 
@@ -13,9 +13,7 @@ declare global {
 }
 
 type Audience = "business" | "agency";
-type Platform = "search" | "meta" | "both";
 type Currency = "USD" | "EUR" | "INR";
-const platformPlans: Record<Platform, number> = { search: 0, meta: 1, both: 2 };
 const pricing = {
   USD: { min: 150, max: 10000, step: 100, start: 1000 },
   EUR: { min: 140, max: 9200, step: 100, start: 900 },
@@ -36,14 +34,14 @@ const countries = [
 
 export default function Home() {
   const [audience, setAudience] = useState<Audience>("business"),
-    [platform, setPlatform] = useState<Platform | null>(null),
+    [selectedPlanId, setSelectedPlanId] = useState<AdwicePlanId | null>(null),
     [currency, setCurrency] = useState<Currency>("USD"),
     [budget, setBudget] = useState(pricing.USD.start),
     [sending, setSending] = useState(false),
     [sent, setSent] = useState(false),
     [error, setError] = useState("");
   const price = pricing[currency],
-    plan = platform ? adwicePlans[platformPlans[platform]] : null,
+    plan = adwicePlans.find(({ id }) => id === selectedPlanId) ?? null,
     fee = plan?.monthlyPlatformFees[currency] ?? 0,
     subtotal = budget + fee,
     gst = currency === "INR" ? Math.round(subtotal * 0.18) : 0,
@@ -128,12 +126,6 @@ export default function Home() {
       setSending(false);
     }
   };
-  const label = (key: Platform) =>
-    key === "search"
-      ? "Search Ads"
-      : key === "meta"
-        ? "Meta Ads"
-        : "Search + Meta";
   return (
     <main>
       <header className="nav shell">
@@ -266,21 +258,20 @@ export default function Home() {
                 </select>
               </label>
               <div className="platformGrid">
-                {(Object.keys(platformPlans) as Platform[]).map((key) => {
-                  const item = adwicePlans[platformPlans[key]];
+                {adwicePlans.map((item) => {
                   return (
                     <button
                       type="button"
-                      className={platform === key ? "selected" : ""}
-                      aria-pressed={platform === key}
+                      className={selectedPlanId === item.id ? "selected" : ""}
+                      aria-pressed={selectedPlanId === item.id}
                       onClick={() => {
-                        setPlatform(key);
+                        setSelectedPlanId(item.id);
                         setBudget(item.default_budget[currency] * 30);
                       }}
-                      key={key}
+                      key={item.id}
                     >
                       <span className="radioDot" />
-                      <strong>{label(key)}</strong>
+                      <strong>{item.label}</strong>
                       <small>{item.description}</small>
                       <b>
                         {money(item.monthlyPlatformFees[currency])}
@@ -356,7 +347,7 @@ export default function Home() {
               />
               {!plan && (
                 <p className="selectionHint">
-                  Select Search Ads, Meta Ads, or Both to continue.
+                  Select a plan to continue.
                 </p>
               )}
             </div>
