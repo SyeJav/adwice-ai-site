@@ -15,18 +15,6 @@ export function SiteFooter() {
           />
         </Link>
         <p>AI-powered campaign strategy, optimization, and reporting.</p>
-      </div>
-      <nav className="footerLinks" aria-label="Legal links">
-        <Link href="/privacy-policy">Privacy Policy</Link>
-        <Link href="/terms-of-service">Terms of Service</Link>
-        <Link href="/cancellation-policy">Cancellation Policy</Link>
-        <Link href="/shipping-and-delivery">Shipping and Delivery</Link>
-      </nav>
-      <div className="footerContact">
-        <WhatsAppLink
-          className="whatsappButton footerWhatsapp"
-          label="Chat on WhatsApp"
-        />
         <div className="socialLinks" role="group" aria-label="Follow Adwice">
           <a
             href="https://www.linkedin.com/company/adwice-technologies/"
@@ -53,6 +41,18 @@ export function SiteFooter() {
             <FacebookIcon />
           </a>
         </div>
+      </div>
+      <nav className="footerLinks" aria-label="Legal links">
+        <Link href="/privacy-policy">Privacy Policy</Link>
+        <Link href="/terms-of-service">Terms of Service</Link>
+        <Link href="/cancellation-policy">Cancellation Policy</Link>
+        <Link href="/shipping-and-delivery">Shipping and Delivery</Link>
+      </nav>
+      <div className="footerContact">
+        <WhatsAppLink
+          className="whatsappButton footerWhatsapp"
+          label="Chat on WhatsApp"
+        />
         <a href="mailto:care@myadwice.com">care@myadwice.com</a>
         <div className="footerPhones" aria-label="Phone numbers">
           <a href="tel:+46761889848">

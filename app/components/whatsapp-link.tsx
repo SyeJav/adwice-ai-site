@@ -10,10 +10,10 @@ export function WhatsAppLink({
   return (
     <a
       className={className}
-      href="https://wa.me/46761889848"
+      href="https://wa.me/917011410689"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Contact Adwice on WhatsApp at +46 76 188 98 48"
+      aria-label="Contact Adwice on WhatsApp at +91 70114 10689"
     >
       <WhatsAppIcon />
       <span>{label}</span>

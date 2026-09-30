@@ -560,9 +560,10 @@ footer {
 }
 .socialLinks {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 8px;
-  margin-bottom: 6px;
+  margin-top: 14px;
+  transform: translateX(-10px);
 }
 .socialLinks a {
   display: grid;
@@ -1087,6 +1088,7 @@ footer {
   }
   .socialLinks {
     justify-content: center;
+    transform: none;
   }
   .legalHero {
     border-radius: 0 0 28px 28px;
