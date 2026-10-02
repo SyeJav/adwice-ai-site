@@ -353,6 +353,106 @@ export default function Home() {
                 </p>
               )}
             </div>
+            <section className="faqSection" aria-labelledby="faq-title">
+              <div className="faqIntro">
+                <p className="sectionTag">Frequently asked questions</p>
+                <h2 id="faq-title">A clearer way to get started</h2>
+                <p>
+                  Answers to common questions about planning your first campaign
+                  with Adwice.
+                </p>
+              </div>
+              <div className="faqList">
+                <details>
+                  <summary>What is Adwice?</summary>
+                  <p>
+                    Adwice is an AI-powered advertising platform that helps
+                    businesses create, launch, manage, and optimize campaigns on
+                    Google, Facebook, and Instagram. Tell us about your business
+                    and goals, and Adwice helps with the complicated advertising
+                    work.
+                  </p>
+                </details>
+                <details>
+                  <summary>Do I need marketing experience?</summary>
+                  <p>
+                    No. Adwice is designed for business owners with little or no
+                    advertising experience. Answer a few simple questions about
+                    your business, customers, location, and goals, and Adwice
+                    helps build your campaign.
+                  </p>
+                </details>
+                <details>
+                  <summary>Do I need a Google Ads or Meta Ads account?</summary>
+                  <p>
+                    No. You can get started through Adwice without setting up
+                    your own Google Ads or Meta Business advertising account.
+                    Adwice handles the advertising setup for you.
+                  </p>
+                </details>
+                <details>
+                  <summary>How can Adwice create my campaign in under 5 minutes?</summary>
+                  <p>
+                    Share a few details about your business, audience, location,
+                    and goals. Adwice uses them to draft your campaign so it can
+                    be ready for your review in under five minutes. You can
+                    review the ads before approving them for launch.
+                  </p>
+                </details>
+                <details>
+                  <summary>What does Adwice AI actually do?</summary>
+                  <p>
+                    Adwice AI helps create your campaign strategy, headlines,
+                    descriptions, keywords, audiences, and targeting. Once your
+                    campaign is running, it can analyze performance and identify
+                    ways to improve it.
+                  </p>
+                </details>
+                <details>
+                  <summary>How much should I spend on advertising?</summary>
+                  <p>
+                    You choose your advertising budget. Adwice shows your ad
+                    spend separately from the Adwice platform fee, and can help
+                    recommend how to allocate your budget across your selected
+                    platforms and campaigns.
+                  </p>
+                </details>
+                <details>
+                  <summary>How will I know if my advertising is working?</summary>
+                  <p>
+                    Adwice provides clear performance reporting so you can
+                    understand results such as clicks, leads, calls,
+                    conversions, and advertising costs without needing to
+                    interpret complex advertising terminology.
+                  </p>
+                </details>
+                <details>
+                  <summary>Does Adwice guarantee leads or sales?</summary>
+                  <p>
+                    No advertising platform can guarantee a specific number of
+                    leads or sales. Results depend on factors such as your
+                    industry, location, competition, budget, website, offer, and
+                    customer demand. Adwice helps you create, monitor, and
+                    improve campaigns using available performance data.
+                  </p>
+                </details>
+              </div>
+              <div className="faqCta">
+                <div>
+                  <h3>Still have questions?</h3>
+                  <p>
+                    Tell us about your business and we&apos;ll show you how
+                    Adwice can help.
+                  </p>
+                </div>
+                <div className="faqCtaActions">
+                  <a className="button primary" href="#budget">
+                    Plan My Campaign <b>↓</b>
+                  </a>
+                  <WhatsAppLink className="whatsappButton" label="Chat With Us" />
+                </div>
+              </div>
+            </section>
           </section>
         </>
       )}
