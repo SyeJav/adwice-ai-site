@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { adwicePlans, type AdwicePlanId } from "../config/adwice-plans";
 import { SiteFooter } from "./components/site-footer";
 import { WhatsAppLink } from "./components/whatsapp-link";
@@ -140,7 +141,8 @@ export default function Home() {
         <nav>
           <a href="#how">How it works</a>
           <a href="#benefits">Why Adwice</a>
-          <a href="/platform">Features</a>
+          <Link href="/platform">Features</Link>
+          <Link href="/website-analyzer">Free Website Analyzer</Link>
           <a href="#contact">Contact</a>
         </nav>
         <div className="navActions">

@@ -43,6 +43,7 @@ export function SiteFooter() {
         </div>
       </div>
       <nav className="footerLinks" aria-label="Legal links">
+        <Link href="/website-analyzer">Free Website Analyzer</Link>
         <Link href="/privacy-policy">Privacy Policy</Link>
         <Link href="/terms-of-service">Terms of Service</Link>
         <Link href="/cancellation-policy">Cancellation Policy</Link>

@@ -35,10 +35,11 @@ export default function PlatformPage() {
           <Image src="/brand/adwice-with-text.svg" alt="Adwice" width={247} height={86} />
         </Link>
         <nav aria-label="Main navigation">
-          <a href="/#how">How it works</a>
-          <a href="/#benefits">Why Adwice</a>
-          <a href="/platform">Features</a>
-          <a href="/#contact">Contact</a>
+          <Link href="/#how">How it works</Link>
+          <Link href="/#benefits">Why Adwice</Link>
+          <Link href="/platform">Features</Link>
+          <Link href="/website-analyzer">Free Website Analyzer</Link>
+          <Link href="/#contact">Contact</Link>
         </nav>
         <div className="navActions">
           <WhatsAppLink />
@@ -53,7 +54,7 @@ export default function PlatformPage() {
           <p className="heroCopy">Plan, launch, optimize, and understand your advertising in one focused platform.</p>
           <div className="actions">
             <Link className="button primary" href="/#contact">Get started <b>↗</b></Link>
-            <a className="button secondary" href="/#how">See how it works</a>
+            <Link className="button secondary" href="/#how">See how it works</Link>
           </div>
         </div>
       </section>
