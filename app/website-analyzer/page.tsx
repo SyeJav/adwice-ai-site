@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
+import { MobileMenu } from "../components/mobile-menu";
 import { WhatsAppLink } from "../components/whatsapp-link";
 import { AnalyzerForm } from "./ui";
 
@@ -18,7 +19,18 @@ export default function WebsiteAnalyzerPage() {
     <header className="nav shell analyzerNav">
       <Link className="brand" href="/" aria-label="Adwice home"><Image src="/brand/adwice-with-text.svg" alt="Adwice" width={247} height={86} /></Link>
       <nav aria-label="Main navigation"><Link href="/platform">Features</Link><Link href="/#how">How it works</Link><Link href="/#contact">Contact</Link></nav>
-      <div className="navActions"><WhatsAppLink /><Link className="navCta" href="/#contact">Plan a campaign</Link></div>
+      <div className="navActions">
+        <WhatsAppLink />
+        <Link className="navCta" href="/#contact">Plan a campaign</Link>
+        <MobileMenu
+          links={[
+            { label: "Features", href: "/platform" },
+            { label: "How it works", href: "/#how" },
+            { label: "Contact", href: "/#contact" },
+          ]}
+          action={{ label: "Plan a campaign", href: "/#contact" }}
+        />
+      </div>
     </header>
     <section className="analyzerHero">
       <div className="shell analyzerHeroInner">
@@ -40,4 +52,3 @@ export default function WebsiteAnalyzerPage() {
     <SiteFooter />
   </main>;
 }
-

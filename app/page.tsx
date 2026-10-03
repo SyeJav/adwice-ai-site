@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { adwicePlans, type AdwicePlanId } from "../config/adwice-plans";
 import { SiteFooter } from "./components/site-footer";
+import { MobileMenu } from "./components/mobile-menu";
 import { WhatsAppLink } from "./components/whatsapp-link";
 
 declare global {
@@ -150,6 +151,19 @@ export default function Home() {
           <a className="navCta" href="#contact">
             {audience === "agency" ? "Agency demo" : "Get started"}
           </a>
+          <MobileMenu
+            links={[
+              { label: "How it works", href: "#how" },
+              { label: "Why Adwice", href: "#benefits" },
+              { label: "Features", href: "/platform" },
+              { label: "Free Website Analyzer", href: "/website-analyzer" },
+              { label: "Contact", href: "#contact" },
+            ]}
+            action={{
+              label: audience === "agency" ? "Agency demo" : "Get started",
+              href: "#contact",
+            }}
+          />
         </div>
       </header>
       <section className={`hero ${audience}`} id="top">

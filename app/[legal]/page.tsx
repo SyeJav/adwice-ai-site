@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "../components/site-footer";
+import { MobileMenu } from "../components/mobile-menu";
 import { WhatsAppLink } from "../components/whatsapp-link";
 
 type LegalSection = {
@@ -204,6 +205,14 @@ export default async function LegalPage({
           <Link className="navCta" href="/#contact">
             Get started
           </Link>
+          <MobileMenu
+            links={[
+              { label: "How it works", href: "/#how" },
+              { label: "Why Adwice", href: "/#benefits" },
+              { label: "Contact", href: "/#contact" },
+            ]}
+            action={{ label: "Get started", href: "/#contact" }}
+          />
         </div>
       </header>
       <main className="legalPage">

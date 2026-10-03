@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
+import { MobileMenu } from "../components/mobile-menu";
 import { WhatsAppLink } from "../components/whatsapp-link";
 
 export const metadata = {
@@ -44,6 +45,16 @@ export default function PlatformPage() {
         <div className="navActions">
           <WhatsAppLink />
           <Link className="navCta" href="/#contact">Get started</Link>
+          <MobileMenu
+            links={[
+              { label: "How it works", href: "/#how" },
+              { label: "Why Adwice", href: "/#benefits" },
+              { label: "Features", href: "/platform" },
+              { label: "Free Website Analyzer", href: "/website-analyzer" },
+              { label: "Contact", href: "/#contact" },
+            ]}
+            action={{ label: "Get started", href: "/#contact" }}
+          />
         </div>
       </header>
 
