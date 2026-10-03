@@ -11,6 +11,47 @@ declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
     fbq?: (...args: unknown[]) => void;
+    LeadProof?: {
+      setConsent: (grants: Record<string, boolean>) => Promise<boolean>;
+      track: (event: string, properties: Record<string, unknown>) => Promise<boolean>;
+      identify: (customer: Record<string, string>) => Promise<boolean>;
+    } | null;
+    LeadProofGrants?: Record<string, boolean>;
+    LeadProofReady?: Promise<Window["LeadProof"]>;
+    LeadProofConsentReady?: Promise<boolean>;
+    resolveLeadProofReady?: (tracker: Window["LeadProof"]) => void;
+    applyLeadProofConsent?: (grants: Record<string, boolean>) => Promise<boolean>;
+  }
+}
+
+async function recordLeadProofContactSuccess(
+  contact: { name: string; email: string; phone?: string },
+  details: Record<string, unknown>,
+) {
+  try {
+    const tracker = await window.LeadProofReady;
+    if (!tracker || !window.LeadProofGrants?.analytics_storage) return false;
+
+    const configured = await window.LeadProofConsentReady;
+    if (!configured) return false;
+
+    const leadAccepted = await tracker.track("lead", {
+      form_id: "contact-form",
+      service: "Adwice enquiry",
+      ...details,
+    });
+    if (!leadAccepted) return false;
+
+    if (window.LeadProofGrants.pii) {
+      const customer: Record<string, string> = {};
+      if (contact.name) customer.name = contact.name;
+      if (contact.email) customer.email = contact.email;
+      if (contact.phone) customer.phone = contact.phone;
+      if (Object.keys(customer).length) return await tracker.identify(customer);
+    }
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -109,6 +150,26 @@ export default function Home() {
         } | null;
       if (!response.ok || result?.status !== "success")
         throw new Error(result?.message);
+
+      const contact = {
+        name: String(data.get("name") || ""),
+        email: String(data.get("email") || ""),
+        phone: String(data.get("phone") || ""),
+      };
+      void recordLeadProofContactSuccess(contact, {
+        website: String(data.get("url") || ""),
+        ...(agencyDemo
+          ? { request_type: "agency" }
+          : {
+              request_type: "business",
+              country: String(data.get("country") || ""),
+              plan: String(data.get("plan") || ""),
+              currency: String(data.get("currency") || ""),
+              monthly_ad_spend: budget,
+              monthly_platform_fee: fee,
+              monthly_total: subtotal + gst,
+            }),
+      });
       window.gtag?.("event", "conversion", {
         send_to: "AW-18454790985/-7nOCNzQ2PkcEMmG999E",
         value: 1.0,
@@ -513,7 +574,12 @@ function LeadForm({
   error: string;
 }) {
   return (
-    <form className={business ? "campaignLeadForm" : ""} onSubmit={onSubmit}>
+    <form
+      id="contact-form"
+      data-lp-ignore
+      className={business ? "campaignLeadForm" : ""}
+      onSubmit={onSubmit}
+    >
       <div className="formGrid">
         <label>
           {business ? "Your Business name" : "Your name"}

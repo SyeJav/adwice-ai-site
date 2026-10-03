@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { LeadProofScripts } from "./components/leadproof-scripts";
 import "./globals.css";
 export const metadata: Metadata = {
   title: "Adwice | AI-Powered Google & Meta Advertising",
@@ -52,6 +53,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <LeadProofScripts
+          siteKey={process.env.NEXT_PUBLIC_LEADPROOF_SITE_KEY}
+          scriptUrl={process.env.NEXT_PUBLIC_LEADPROOF_SCRIPT_URL}
+        />
         <Script id="meta-pixel" strategy="beforeInteractive">
           {`
             !function(f,b,e,v,n,t,s)
