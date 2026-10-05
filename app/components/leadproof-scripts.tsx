@@ -3,7 +3,7 @@
 import Script from "next/script";
 
 const DEFAULT_SITE_KEY = "lp_site_9eb6bbc90d33ee8e232c3488d267d61e";
-const DEFAULT_SCRIPT_URL = "https://leads.myadwice.com/tracker.js";
+const DEFAULT_SCRIPT_URL = "https://leads.myadwice.com/app/tracker.js";
 
 export function LeadProofScripts({
   siteKey = DEFAULT_SITE_KEY,
