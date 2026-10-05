@@ -2100,3 +2100,87 @@ footer {
 .campaignLeadForm > .button {
   margin-top: 3px;
 }
+
+.consentBanner {
+  position: fixed;
+  z-index: 1000;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 22px 24px;
+  color: #f8fafb;
+  background: #17252b;
+  border: 1px solid #ffffff1f;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px #0b171d4d;
+}
+.consentBanner h2 {
+  margin: 0 0 6px;
+  color: #fff;
+  font-size: 18px;
+}
+.consentBanner p {
+  max-width: 610px;
+  margin: 0;
+  color: #d9e0e3;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.consentBanner a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.consentActions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+}
+.consentActions button,
+.consentSettings {
+  cursor: pointer;
+  border: 1px solid #ffffff52;
+  border-radius: 9px;
+  padding: 11px 15px;
+  color: #fff;
+  background: transparent;
+  font: 700 12px inherit;
+}
+.consentActions .consentAccept {
+  border-color: var(--orange);
+  background: var(--orange);
+}
+.consentActions button:focus-visible,
+.consentSettings:focus-visible {
+  outline: 3px solid #ef6a4559;
+  outline-offset: 2px;
+}
+.consentSettings {
+  position: fixed;
+  z-index: 999;
+  bottom: 12px;
+  left: 12px;
+  padding: 8px 11px;
+  color: #344149;
+  background: #fff;
+  border-color: #d7dddf;
+  box-shadow: 0 5px 18px #17252b1f;
+}
+@media (max-width: 700px) {
+  .consentBanner {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+  }
+  .consentActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

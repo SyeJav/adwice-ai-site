@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { ConsentBanner } from "./components/consent-banner";
 import { LeadProofScripts } from "./components/leadproof-scripts";
 import "./globals.css";
 export const metadata: Metadata = {
@@ -59,16 +60,24 @@ export default function RootLayout({
         />
         <Script id="meta-pixel" strategy="beforeInteractive">
           {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '2015224922626516');
-            fbq('track', 'PageView');
+            window.loadAdwiceMetaPixel = function () {
+              if (window.fbq) return;
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '2015224922626516');
+              fbq('track', 'PageView');
+            };
+            window.addEventListener('adwice:consent', function (event) {
+              if (event.detail && event.detail.advertising_storage) {
+                window.loadAdwiceMetaPixel();
+              }
+            });
           `}
         </Script>
         <Script
@@ -80,6 +89,12 @@ export default function RootLayout({
           {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
+              gtag('consent', 'default', {
+                'analytics_storage': 'denied',
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied'
+              });
               gtag('js', new Date());
               gtag('config', 'AW-18454790985');
               gtag('config', 'AW-18454790985/FTeFCO_n1_kcEMmG999E', {
@@ -89,17 +104,12 @@ export default function RootLayout({
         </Script>
       </head>
       <body>
-        <noscript
-          dangerouslySetInnerHTML={{
-            __html:
-              '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2015224922626516&ev=PageView&noscript=1" alt="" />',
-          }}
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
         {children}
+        <ConsentBanner />
       </body>
     </html>
   );
